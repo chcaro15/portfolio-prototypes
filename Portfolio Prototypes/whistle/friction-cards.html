@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Friction points and design opportunities</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #fff;
+    font-family: 'Figtree', system-ui, sans-serif;
+    color: #243C4B;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 8px 16px 16px; display: flex; flex-direction: column; gap: 28px; }
+  .intro { display: flex; flex-direction: column; gap: 12px; max-width: 640px; }
+  .intro h2 { margin: 0; font-size: 28px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.2; color: #1C1C1C; }
+  .intro p { margin: 0; font-size: 15px; line-height: 1.5; color: #6D6D6D; }
+
+  .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+  @media (max-width: 720px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+
+  .card { border: 1px solid #E5E5E5; border-radius: 3px; box-shadow: 0 1px 5px rgba(0,0,0,0.10); overflow: hidden; }
+  .track { display: flex; width: 200%; transition: transform 320ms cubic-bezier(0.2,0,0,1); }
+  .card.is-flipped .track { transform: translateX(-50%); }
+
+  .face { width: 50%; flex: none; padding: 26px; display: flex; flex-direction: column; gap: 12px; min-height: 300px; }
+  .face--friction { background: #fff; }
+  .face--opp { background: #243C4B; }
+
+  .meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .meta-left { display: flex; align-items: center; gap: 10px; }
+  .num { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; }
+  .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+  .face--friction .num { color: #4D93D7; }
+  .face--friction .eyebrow { color: #6D6D6D; }
+  .face--friction .meta .material-icons { font-size: 28px; color: #B8C4CE; }
+  .face--opp .num, .face--opp .eyebrow { color: #9CC6EA; }
+  .face--opp .meta .material-icons { font-size: 28px; color: #4D93D7; }
+
+  h3 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.2; text-wrap: pretty; }
+  .face--friction h3 { color: #1C1C1C; }
+  .face--opp h3 { color: #fff; }
+  .body { margin: 0; font-size: 15px; line-height: 1.55; text-wrap: pretty; }
+  .face--friction .body { color: #6D6D6D; }
+  .face--opp .body { color: #C9D6E0; }
+
+  .actions { margin-top: auto; display: flex; align-items: center; gap: 12px; padding-top: 16px; }
+  .face--friction .actions { justify-content: flex-end; }
+  .face--opp .actions { justify-content: flex-start; }
+  .actions span.label { font-size: 12px; }
+  .face--friction .actions .label { color: #6D6D6D; }
+  .face--opp .actions .label { color: #9CC6EA; }
+
+  button {
+    width: 40px; height: 40px; flex: none; border-radius: 2px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font: inherit;
+    transition: background 120ms cubic-bezier(0.2,0,0,1);
+  }
+  button .material-icons { font-size: 22px; }
+  .btn-next { border: none; background: #4D93D7; color: #fff; }
+  .btn-next:hover { background: #2F74AF; }
+  .btn-back { border: 1px solid rgba(255,255,255,0.35); background: transparent; color: #fff; }
+  .btn-back:hover { background: rgba(255,255,255,0.12); }
+  button:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(77,147,215,0.35); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="intro">
+    <h2>Four friction points, four design opportunities</h2>
+    <p>Click the arrow on any card to see the design opportunity behind it.</p>
+  </div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<script>
+const CARDS = [
+  {
+    num: '01',
+    frictionIcon: 'sync_problem',
+    oppIcon: 'hub',
+    frictionTitle: 'Too many handoffs',
+    frictionBody: 'Game information moves between managers, referees, paper and GotSport.',
+    oppTitle: 'One shared game record',
+    oppBody: 'Keep everyone working form the same game information'
+  },
+  {
+    num: '02',
+    frictionIcon: 'print',
+    oppIcon: 'devices',
+    frictionTitle: 'Digital \u2192 physical \u2192 digital',
+    frictionBody: 'Managers print match cards, carry them to the field, collect signatures, photograph them, and upload them again.',
+    oppTitle: 'Keep the game workflow digital',
+    oppBody: 'Keep the game workflow digital from preparation through reporting.'
+  },
+  {
+    num: '03',
+    frictionIcon: 'content_copy',
+    oppIcon: 'cloud_done',
+    frictionTitle: 'Duplicate work',
+    frictionBody: 'The same game information may need to be recorded or submitted by different people in different places.',
+    oppTitle: 'Capture information once',
+    oppBody: 'Capture information once and make it available to everyone who needs it.'
+  },
+  {
+    num: '04',
+    frictionIcon: 'payments',
+    oppIcon: 'credit_card',
+    frictionTitle: 'Coming prepared with exact cash',
+    frictionBody: 'Managers have to remember to bring the correct cash amount for referee fees\u2014and coordinate payment with the referee before the game begins.',
+    oppTitle: 'Make referee payments digital',
+    oppBody: 'Give managers and referees a way to view, confirm, and complete game fees digitally, reducing the need to carry and exchange cash on game day.'
+  }
+];
+
+const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+document.getElementById('grid').innerHTML = CARDS.map(c => `
+  <div class="card">
+    <div class="track">
+      <div class="face face--friction">
+        <div class="meta">
+          <div class="meta-left">
+            <span class="num">${c.num}</span>
+            <span class="eyebrow">Current friction</span>
+          </div>
+          <span class="material-icons">${c.frictionIcon}</span>
+        </div>
+        <h3>${esc(c.frictionTitle)}</h3>
+        <p class="body">${esc(c.frictionBody)}</p>
+        <div class="actions">
+          <span class="label">See the opportunity</span>
+          <button type="button" class="btn-next" aria-label="See the design opportunity">
+            <span class="material-icons">arrow_forward</span>
+          </button>
+        </div>
+      </div>
+      <div class="face face--opp">
+        <div class="meta">
+          <div class="meta-left">
+            <span class="num">${c.num}</span>
+            <span class="eyebrow">Design opportunity</span>
+          </div>
+          <span class="material-icons">${c.oppIcon}</span>
+        </div>
+        <h3>${esc(c.oppTitle)}</h3>
+        <p class="body">${esc(c.oppBody)}</p>
+        <div class="actions">
+          <button type="button" class="btn-back" aria-label="Back to the friction">
+            <span class="material-icons">arrow_back</span>
+          </button>
+          <span class="label">Back</span>
+        </div>
+      </div>
+    </div>
+  </div>
+`).join('');
+
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.btn-next, .btn-back');
+  if (!btn) return;
+  btn.closest('.card').classList.toggle('is-flipped', btn.classList.contains('btn-next'));
+});
+
+// Report height to the parent frame so Framer can size the embed.
+function postHeight() {
+  const h = document.documentElement.scrollHeight;
+  parent.postMessage({ type: 'embed-height', height: h }, '*');
+}
+window.addEventListener('load', postHeight);
+window.addEventListener('resize', postHeight);
+</script>
+
+</body>
+</html>
