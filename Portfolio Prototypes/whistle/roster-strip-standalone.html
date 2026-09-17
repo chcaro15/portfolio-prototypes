@@ -49,15 +49,15 @@
   .nav button[disabled] { opacity: 0.4; cursor: default; background: #fff; border-color: #E5E5E5; }
   .bar-right { display: flex; align-items: center; gap: 14px; }
 
-  figure { margin: 0; flex: 0 0 78%; max-width: 300px; scroll-snap-align: start; display: flex; flex-direction: column; gap: 10px; }
+  figure { margin: 0; flex: 0 0 min(340px, 86vw); max-width: 340px; scroll-snap-align: start; display: flex; flex-direction: column; gap: 10px; }
   .track.single { scroll-snap-type: none; }
-  .track.single figure { flex: 0 0 100%; max-width: 340px; margin: 0 auto; }
+  .track.single figure { flex: 0 0 min(340px, 86vw); max-width: 340px; margin: 0 auto; }
   figure img { display: block; width: 100%; height: auto; }
   figcaption { font-size: 13px; line-height: 1.45; color: #6D6D6D; text-wrap: pretty; display: flex; gap: 8px; }
   figcaption .n { flex: none; font-weight: 700; color: #4D93D7; font-variant-numeric: tabular-nums; }
 
   @media (min-width: 720px) {
-    figure { flex: 0 0 260px; max-width: 260px; }
+    figure { flex: 0 0 340px; max-width: 340px; }
     .hint { display: none; }
     .nav { display: flex; }
   }
@@ -106,7 +106,7 @@
     const nav = strip.querySelector('[data-nav]');
     const step = () => {
       const g = parseFloat(getComputedStyle(track).columnGap) || 16;
-      return (figs[0] ? figs[0].offsetWidth : 260) + g;
+      return (figs[0] ? figs[0].offsetWidth : 340) + g;
     };
     if (nav) {
       nav.querySelector('[data-prev]').addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
